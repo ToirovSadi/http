@@ -3,6 +3,7 @@ package banners
 import (
 	"context"
 	"errors"
+	"strconv"
 	"sync"
 )
 
@@ -21,6 +22,7 @@ type Banner struct {
 	Content string
 	Button  string
 	Link    string
+	Image   string
 }
 
 func (s *Service) All(ctx context.Context) ([]*Banner, error) {
@@ -47,6 +49,7 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	newItem := item
 	if id == 0 {
 		id = curID
+		newItem.Image = (strconv.Itoa(int(id)) + newItem.Image)
 		curID++
 	} else {
 		_, err := s.ByID(ctx, id)
