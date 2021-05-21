@@ -41,7 +41,7 @@ func (s *Service) ByID(ctx context.Context, id int64) (*Banner, error) {
 	return nil, errors.New("item not found")
 }
 
-var curID int64 = 1
+var curID int64 = 0
 
 func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	if item.ID == 0 {
