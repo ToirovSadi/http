@@ -3,7 +3,6 @@ package banners
 import (
 	"context"
 	"errors"
-	"strconv"
 	"sync"
 )
 
@@ -45,25 +44,19 @@ func (s *Service) ByID(ctx context.Context, id int64) (*Banner, error) {
 var curID int64 = 1
 
 func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
-	id := item.ID
-	newItem := item
-	if id == 0 {
-		id = curID
-		newItem.Image = (strconv.Itoa(int(id)) + newItem.Image)
+	if item.ID == 0 {
 		curID++
-	} else {
-		_, err := s.ByID(ctx, id)
-		if err != nil {
-			return nil, err
-		}
-		_, err = s.RemoveByID(ctx, id)
-		if err != nil {
-			return nil, err
+		item.ID = curID
+		s.items = append(s.items, item)
+		return item, nil
+	}
+	for i := 0; i < len(s.items); i++ {
+		if s.items[i].ID == item.ID {
+			s.items[i] = item
+			return item, nil
 		}
 	}
-	newItem.ID = id
-	s.items = append(s.items, newItem)
-	return newItem, nil
+	return nil, errors.New("item not found")
 }
 
 func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {

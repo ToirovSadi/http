@@ -84,7 +84,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	banner.Image = imageName // for now just extension
+	banner.Image = imageName
 
 	updBanner, err = s.bannersSvc.Save(r.Context(), banner)
 	if err != nil {
