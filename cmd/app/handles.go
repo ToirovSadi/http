@@ -84,10 +84,11 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if imageName != "" {
-		banner.Image = imageName
+		updBanner.Image = imageName
+		log.Println("update banner.Image: ", imageName)
 	}
 
-	updBanner, err = s.bannersSvc.Save(r.Context(), banner)
+	updBanner, err = s.bannersSvc.Save(r.Context(), updBanner)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

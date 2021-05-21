@@ -1,0 +1,10 @@
+GET http://localhost:8080/banners.getAll HTTP/1.1
+
+###
+GET http://localhost:8080/banners.save?id=0&title=title_null&content=content_null&button=button_null&link=link_none HTTP/1.1
+
+###
+GET http://localhost:8080/banners.getById?id=1 HTTP/1.1
+
+###
+GET http://localhost:8080/banners.removeById?id=3 HTTP/1.1

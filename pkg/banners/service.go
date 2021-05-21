@@ -52,6 +52,9 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	}
 	for i := 0; i < len(s.items); i++ {
 		if s.items[i].ID == item.ID {
+			if item.Image == "" {
+				item.Image = s.items[i].Image
+			}
 			s.items[i] = item
 			return item, nil
 		}
