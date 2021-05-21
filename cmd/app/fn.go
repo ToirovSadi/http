@@ -13,9 +13,6 @@ import (
 )
 
 func uploadImage(item *banners.Banner, r *http.Request) (string, error) {
-	if len(r.PostFormValue("image")) == 0 {
-		return item.Image, nil
-	}
 	err := r.ParseMultipartForm(10 << 20) // size of coming data(image)
 	if err != nil {
 		log.Println("Err:app:uploadImage(): ", err)
