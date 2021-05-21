@@ -1,10 +1,11 @@
 package app
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/ToirovSadi/http/pkg/banners"
 )
 
 func (s *Server) handleGetAllBanners(w http.ResponseWriter, r *http.Request) {
@@ -46,33 +47,46 @@ func (s *Server) handleGetBannerById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
-	title := r.URL.Query().Get("title")
-	content := r.URL.Query().Get("content")
-	button := r.URL.Query().Get("button")
-	link := r.URL.Query().Get("link")
+	idParam := r.PostFormValue("id")
+	if idParam == "" {
+		return
+	}
+	title := r.PostFormValue("title")
+	content := r.PostFormValue("content")
+	button := r.PostFormValue("button")
+	link := r.PostFormValue("link")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	banner, err := s.bannersSvc.ByID(r.Context(), id)
-	if err == nil {
-		if title != "" {
-			banner.Title = title
-		}
-		if content != "" {
-			banner.Content = content
-		}
-		if button != "" {
-			banner.Button = button
-		}
-		if link != "" {
-			banner.Link = link
-		}
+
+	banner := &banners.Banner{
+		ID:      id,
+		Title:   title,
+		Content: content,
+		Button:  button,
+		Link:    link,
+		Image:   "-",
 	}
+
+	// to get real id
 	updBanner, err := s.bannersSvc.Save(r.Context(), banner)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	imageName, err := uploadImage(updBanner.ID, r)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	banner.Image = imageName // for now just extension
+
+	updBanner, err = s.bannersSvc.Save(r.Context(), banner)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -105,13 +119,4 @@ func (s *Server) handleRemoveById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
-}
-func writeJson(w http.ResponseWriter, item interface{}) error {
-	data, err := json.Marshal(item)
-	if err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "appication/json")
-	_, err = w.Write(data)
-	return err
 }
