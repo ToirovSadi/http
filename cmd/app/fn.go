@@ -19,9 +19,9 @@ func uploadImage(item *banners.Banner, r *http.Request) (string, error) {
 		return "", err
 	}
 	file, header, err := r.FormFile("image")
-	if err != nil {
-		log.Println("Err:app:uploadImage(): ", err)
-		return "", err
+	if err != nil { // if error occur it should be "http: no such file"
+		log.Println("Err:app:uploadImage(): no such file founded")
+		return "", nil
 	}
 	defer file.Close()
 	imageName := string(strconv.Itoa(int(item.ID)) + "." + getExtension(header.Filename))
