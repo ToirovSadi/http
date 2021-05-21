@@ -8,9 +8,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/ToirovSadi/http/pkg/banners"
 )
 
-func uploadImage(id int64, r *http.Request) (string, error) {
+func uploadImage(item *banners.Banner, r *http.Request) (string, error) {
+	if len(r.PostFormValue("image")) == 0 {
+		return item.Image, nil
+	}
 	err := r.ParseMultipartForm(10 << 20) // size of coming data(image)
 	if err != nil {
 		log.Println("Err:app:uploadImage(): ", err)
@@ -22,7 +27,7 @@ func uploadImage(id int64, r *http.Request) (string, error) {
 		return "", err
 	}
 	defer file.Close()
-	imageName := string(strconv.Itoa(int(id)) + "." + getExtension(header.Filename))
+	imageName := string(strconv.Itoa(int(item.ID)) + "." + getExtension(header.Filename))
 
 	// tempFile, err := ioutil.TempFile("web/banners", imageName)
 	// if err != nil {

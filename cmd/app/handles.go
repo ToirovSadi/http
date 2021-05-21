@@ -68,9 +68,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		Content: content,
 		Button:  button,
 		Link:    link,
-		Image:   "-",
 	}
-
 	// to get real id
 	updBanner, err := s.bannersSvc.Save(r.Context(), banner)
 	if err != nil {
@@ -79,7 +77,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imageName, err := uploadImage(updBanner.ID, r)
+	imageName, err := uploadImage(updBanner, r)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
